@@ -96,11 +96,11 @@
     </div>
 
     <script>
-        // Yeni Supabase Bağlantı Bilgileri
+        // Supabase İstemci Tanımlaması (Çakışma Önleyici İsimlendirme)
         const SUPABASE_URL = 'https://aishcztrapnaxmbnjogr.supabase.co';
         const SUPABASE_ANON_KEY = 'sb_publishable_wIsyK9CDenKG2U19mQ8VAA_6hrIchYZ';
 
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        const sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         let isRegisterMode = false;
         let currentChannel = 'genel';
@@ -123,7 +123,7 @@
             }
 
             if (isRegisterMode) {
-                const { data, error } = await supabase.auth.signUp({ email, password });
+                const { data, error } = await sbClient.auth.signUp({ email, password });
                 if (error) {
                     alert('Kayıt Hatası: ' + error.message);
                     return;
@@ -132,7 +132,7 @@
                 isRegisterMode = false;
                 toggleAuthMode();
             } else {
-                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
                 if (error) {
                     alert('Giriş Hatası: ' + error.message);
                     return;
@@ -159,7 +159,7 @@
                 const text = input.value.trim();
                 if (!text || !currentUser) return;
 
-                const { error } = await supabase.from('messages').insert([{
+                const { error } = await sbClient.from('messages').insert([{
                     text: text,
                     user_email: currentUser.email,
                     channel: currentChannel,
@@ -184,17 +184,17 @@
             }
 
             const fileName = `${Date.now()}_${file.name}`;
-            const { error } = await supabase.storage.from('uploads').upload(fileName, file);
+            const { error } = await sbClient.storage.from('uploads').upload(fileName, file);
 
             if (error) {
                 alert('Dosya yükleme hatası: ' + error.message);
                 return;
             }
 
-            const { data: publicUrlData } = supabase.storage.from('uploads').getPublicUrl(fileName);
+            const { data: publicUrlData } = sbClient.storage.from('uploads').getPublicUrl(fileName);
             const imageUrl = publicUrlData.publicUrl;
 
-            await supabase.from('messages').insert([{
+            await sbClient.from('messages').insert([{
                 text: imageUrl,
                 user_email: currentUser.email,
                 channel: currentChannel,
@@ -204,7 +204,7 @@
 
         async function loadMessages() {
             const chatMessages = document.getElementById('chatMessages');
-            const { data, error } = await supabase
+            const { data, error } = await sbClient
                 .from('messages')
                 .select('*')
                 .eq('channel', currentChannel)
@@ -218,7 +218,7 @@
         }
 
         function listenMessages() {
-            supabase
+            sbClient
                 .channel('public:messages')
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages' }, payload => {
                     if (payload.new.channel === currentChannel) {
