@@ -1,6 +1,6 @@
-// Supabase Bilgilerin (Kendi bilgilerini buraya yapıştır)
+// Supabase Bağlantı Bilgilerin
 const SUPABASE_URL = 'https://gzazhrtgtbhomlblivxj.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_buraya_kopyaladigin_uzun_anahtari_yapistir';
+const SUPABASE_ANON_KEY = 'sb_publishable_c1-4ZRZd5upcTHElMFFzag_w8bYMc4P';
 
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
